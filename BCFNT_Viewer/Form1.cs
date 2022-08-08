@@ -38,18 +38,23 @@ namespace BCFNT_Viewer
             CFNTData = new CFNTFormat.CFNT(CFNTFormat.FINFVersion.Version3);
             CFNTData.ReadCFNT(br1);
 
-			pictureBox1.BackColor = Color.Black;
-			pictureBox1.Image = CFNTData.FINF_v3.TGLP_Ver3.TGLPImgDataList[0].SheetImg;
+            pictureBox1.BackColor = Color.Black;
+            pictureBox1.Image = CFNTData.FINF_v3.TGLP_Ver3.TGLPImgDataList[0].SheetImg;
 
-			propertyGrid1.SelectedObject = new CFNT_PropertyGridSetting(CFNTData);
-		}
+            propertyGrid1.SelectedObject = new CFNT_PropertyGridSetting(CFNTData);
+        }
 
-		private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-		{
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             CFNTData = null;
             pictureBox1.Image = null;
             propertyGrid1.SelectedObject = null;
             pictureBox1.BackColor = Color.White;
         }
-	}
+
+        private void saveBCFNTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

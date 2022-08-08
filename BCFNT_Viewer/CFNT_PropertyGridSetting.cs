@@ -192,7 +192,8 @@ namespace BCFNT_Viewer
                 public CMAP N_CMAP { get; set; }
 
                 public int UnknownData { get; set; } //MappingType : 0 => Enable, MappingType : 1, 2 => Disable
-                public List<byte[]> CharList { get; set; }
+                //public List<byte[]> CharList { get; set; }
+                public List<string> CharList { get; set; }
 
                 public CMAP(CFNTFormat.CMAP CMAPData)
 				{
@@ -208,7 +209,7 @@ namespace BCFNT_Viewer
                         N_CMAP = new CMAP(CMAPData.N_CMAP);
 					}
                     UnknownData = CMAPData.UnknownData;
-                    CharList = CMAPData.CharList;
+                    CharList = CMAPData.CharList.Select(x => System.Text.Encoding.Unicode.GetString(x)).ToList();
 				}
 
 				public override string ToString()
