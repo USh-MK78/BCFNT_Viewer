@@ -8,23 +8,23 @@ using System.Threading.Tasks;
 namespace BCFNT_Viewer
 {
     public class EndianConvert
-	{
+    {
         public enum Endian
-		{
+        {
             BigEndian = 65534,
             LittleEndian = 65279
-		}
+        }
 
         public byte[] BOM { get; set; }
         public Endian Endians => EndianCheck();
 
         public EndianConvert(byte[] InputBOM)
-		{
+        {
             BOM = InputBOM;
-		}
+        }
 
         public Endian EndianCheck()
-		{
+        {
             bool LE = BOM.SequenceEqual(new byte[] { 0xFF, 0xFE });
             bool BE = BOM.SequenceEqual(new byte[] { 0xFE, 0xFF });
 
@@ -40,9 +40,9 @@ namespace BCFNT_Viewer
         }
 
         public byte[] Convert(byte[] Input)
-		{
+        {
             if (Endians == Endian.BigEndian)
-			{
+            {
                 return Input.Reverse().ToArray();
             }
             if (Endians == Endian.LittleEndian)
@@ -52,7 +52,7 @@ namespace BCFNT_Viewer
 
             return Input;
         }
-	}
+    }
 
     public class ReadByteLine
     {
@@ -128,16 +128,16 @@ namespace BCFNT_Viewer
     }
 
     public class TaskHelper
-	{
+    {
         public static Task<T> RunTask<T>(object obj)
-		{
+        {
             Task<T> r = Task.Run(() => { return (T)obj; });
             return r;
-		}
+        }
 
         public static Task<T> RunTask<T>(BinaryReader br, int Offset, object obj)
         {
-            Task<T> r = Task.Run(() => 
+            Task<T> r = Task.Run(() =>
             {
                 long Pos = br.BaseStream.Position;
 
@@ -159,19 +159,19 @@ namespace BCFNT_Viewer
     }
 
     public class Converter
-	{
+    {
         public static bool ByteToBoolean(byte Input)
-		{
+        {
             bool b = new bool();
             if (Input == 0) b = false;
             if (Input == 1) b = true;
             return b;
-		}
+        }
 
         public static byte BooleanToByte(bool Input)
-		{
+        {
             return Convert.ToByte(Input);
-		}
+        }
 
         public enum ConvertType
         {
@@ -221,27 +221,27 @@ namespace BCFNT_Viewer
     }
 
     public class BinaryReadHelper
-	{
+    {
         public byte[] BOMs;
         public BinaryReader BR { get; set; }
         public T[] ReadArray<T>(int Count, int ByteLength)
-		{
+        {
             T[] Ary = new T[Count];
             for (int i = 0; i < Count; i++) Ary[i] = Converter.CustomBitConverter<T>(BR.ReadBytes(ByteLength), 0);
             return Ary;
-		}
+        }
 
         public byte[] ReadArray(int Count)
-		{
+        {
             byte[] Ary = new byte[Count];
             for (int i = 0; i < Count; i++) Ary[i] = BR.ReadByte();
             return Ary;
         }
 
         public BinaryReadHelper(BinaryReader br, byte[] BOM)
-		{
+        {
             BOMs = BOM;
             BR = br;
         }
-	}
+    }
 }

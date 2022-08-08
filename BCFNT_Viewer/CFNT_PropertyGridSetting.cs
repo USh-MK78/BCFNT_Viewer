@@ -41,11 +41,11 @@ namespace BCFNT_Viewer
                 public int CharWidth { get; set; }
 
                 public DefaultWidth(CFNTFormat.DefaultWidth defaultWidth)
-				{
+                {
                     Left = defaultWidth.Left;
                     GlyphWidth = defaultWidth.GlyphWidth;
                     CharWidth = defaultWidth.CharWidth;
-				}
+                }
 
                 public override string ToString()
                 {
@@ -80,7 +80,7 @@ namespace BCFNT_Viewer
                 public byte[] UnknownArea { get; set; }
 
                 public Version3_TGLP(CFNTFormat.TGLP.Version3 version3)
-				{
+                {
                     TGLPHeader = version3.TGLPHeader;
                     SectionSize = version3.SectionSize;
                     CellWidth = version3.CellWidth;
@@ -97,7 +97,7 @@ namespace BCFNT_Viewer
 
                     TGLPImageList = version3.TGLPImgDataList.Select(x => x.SheetImg).ToList();
                     UnknownArea = version3.UnknownArea;
-				}
+                }
 
                 public override string ToString()
                 {
@@ -131,12 +131,12 @@ namespace BCFNT_Viewer
                     public byte Char_Width { get; set; }
 
                     public CharWidth(CFNTFormat.CharWidth charWidth)
-					{
+                    {
                         GlyphNumber = charWidth.GlyphNumber;
                         Left = charWidth.Left;
                         Glyph_Width = charWidth.Glyph_Width;
                         Char_Width = charWidth.Char_Width;
-					}
+                    }
 
                     public override string ToString()
                     {
@@ -145,25 +145,25 @@ namespace BCFNT_Viewer
                 }
 
                 public CWDH(CFNTFormat.CWDH CWDHData)
-				{
+                {
                     CWDHHeader = CWDHData.CWDHHeader;
                     SectionSize = CWDHData.SectionSize;
                     StartIndex = CWDHData.StartIndex;
                     EndIndex = CWDHData.EndIndex;
                     NextCWDHOffset = CWDHData.NextCWDHOffset;
                     if (CWDHData.NextCWDHOffset != 0 && CWDHData.N_CWDH != null)
-					{
+                    {
                         N_CWDH = new CWDH(CWDHData.N_CWDH);
-					}
+                    }
                     //CharWidth_List = CWDHData.CharWidth_List;
                     CharWidth_List = new List<CharWidth>();
 
                     for (int i = 0; i < CWDHData.CharWidth_List.Count; i++)
-					{
+                    {
                         CharWidth_List.Add(new CharWidth(CWDHData.CharWidth_List[i]));
-					}
+                    }
 
-				}
+                }
 
                 public override string ToString()
                 {
@@ -177,7 +177,7 @@ namespace BCFNT_Viewer
             [TypeConverter(typeof(CustomExpandableObjectSortTypeConverter))]
             public CMAP CMAPSection { get; set; }
             public class CMAP
-			{
+            {
                 public char[] CMAPHeader { get; set; }
                 public int SectionSize { get; set; }
                 public short CodeBegin { get; set; }
@@ -196,7 +196,7 @@ namespace BCFNT_Viewer
                 public List<string> CharList { get; set; }
 
                 public CMAP(CFNTFormat.CMAP CMAPData)
-				{
+                {
                     CMAPHeader = CMAPData.CMAPHeader;
                     SectionSize = CMAPData.SectionSize;
                     CodeBegin = CMAPData.CodeBegin;
@@ -205,18 +205,18 @@ namespace BCFNT_Viewer
                     ReservedByte = CMAPData.ReservedByte;
                     NextCMAPOffset = CMAPData.NextCMAPOffset;
                     if (NextCMAPOffset != 0 && CMAPData.N_CMAP != null)
-					{
+                    {
                         N_CMAP = new CMAP(CMAPData.N_CMAP);
-					}
+                    }
                     UnknownData = CMAPData.UnknownData;
                     CharList = CMAPData.CharList.Select(x => System.Text.Encoding.Unicode.GetString(x)).ToList();
-				}
+                }
 
-				public override string ToString()
-				{
-					return "CMAP";
-				}
-			}
+                public override string ToString()
+                {
+                    return "CMAP";
+                }
+            }
 
             public byte Height { get; set; }
             public byte Width { get; set; }
@@ -224,7 +224,7 @@ namespace BCFNT_Viewer
             public byte Reserved { get; set; }
 
             public Version3_FINF_PGS(CFNTFormat.FINF.Version3 FINFData)
-			{
+            {
                 FINFHeader = FINFData.FINFHeader;
                 SectionSize = FINFData.SectionSize;
                 FontType = FINFData.FontType;
@@ -242,7 +242,7 @@ namespace BCFNT_Viewer
                 Width = FINFData.Width;
                 Ascent = FINFData.Ascent;
                 Reserved = FINFData.Reserved;
-			}
+            }
 
             public override string ToString()
             {
@@ -250,67 +250,67 @@ namespace BCFNT_Viewer
             }
         }
 
-		#region Backup
-		//[Category("FINF_v4")]
-		//[TypeConverter(typeof(ExpandableObjectConverter))]
-		//public Version4_FINF_PGS Version4_FINF { get; set; } = new Version4_FINF_PGS();
-		//public class Version4_FINF_PGS
-		//{
-		//    public int FontType { get; set; }
-		//    public int Height { get; set; }
-		//    public int Width { get; set; }
-		//    public byte Ascent { get; set; }
-		//    public int LineFeed { get; set; }
-		//    public int AlterCharIndex { get; set; }
+        #region Backup
+        //[Category("FINF_v4")]
+        //[TypeConverter(typeof(ExpandableObjectConverter))]
+        //public Version4_FINF_PGS Version4_FINF { get; set; } = new Version4_FINF_PGS();
+        //public class Version4_FINF_PGS
+        //{
+        //    public int FontType { get; set; }
+        //    public int Height { get; set; }
+        //    public int Width { get; set; }
+        //    public byte Ascent { get; set; }
+        //    public int LineFeed { get; set; }
+        //    public int AlterCharIndex { get; set; }
 
-		//    [Category("FINF_v4_DefaultWidth")]
-		//    [TypeConverter(typeof(ExpandableObjectConverter))]
-		//    public DefaultWidth Default_Width { get; set; } = new DefaultWidth();
-		//    public class DefaultWidth
-		//    {
-		//        public int Left { get; set; }
-		//        public int GlyphWidth { get; set; }
-		//        public int CharWidth { get; set; }
+        //    [Category("FINF_v4_DefaultWidth")]
+        //    [TypeConverter(typeof(ExpandableObjectConverter))]
+        //    public DefaultWidth Default_Width { get; set; } = new DefaultWidth();
+        //    public class DefaultWidth
+        //    {
+        //        public int Left { get; set; }
+        //        public int GlyphWidth { get; set; }
+        //        public int CharWidth { get; set; }
 
-		//        public override string ToString()
-		//        {
-		//            return "DefaultWidth";
-		//        }
-		//    }
+        //        public override string ToString()
+        //        {
+        //            return "DefaultWidth";
+        //        }
+        //    }
 
-		//    public byte Encoding { get; set; }
+        //    public byte Encoding { get; set; }
 
-		//    [Category("TGLP_v4")]
-		//    [TypeConverter(typeof(ExpandableObjectConverter))]
-		//    public Version4_TGLP TGLP_Ver4 { get; set; } = new Version4_TGLP();
-		//    public class Version4_TGLP
-		//    {
-		//        public int CellWidth { get; set; }
-		//        public int CellHeight { get; set; }
-		//        public int NumberOfSheets { get; set; }
-		//        public int MaxCharacterWidth { get; set; }
-		//        public int Baseline_Position { get; set; }
-		//        public int SheetImgFormat { get; set; }
-		//        public int NumberOfSheetColumns { get; set; }
-		//        public int NumberOfSheetRows { get; set; }
-		//        public int SheetWidth { get; set; }
-		//        public int SheetHeight { get; set; }
+        //    [Category("TGLP_v4")]
+        //    [TypeConverter(typeof(ExpandableObjectConverter))]
+        //    public Version4_TGLP TGLP_Ver4 { get; set; } = new Version4_TGLP();
+        //    public class Version4_TGLP
+        //    {
+        //        public int CellWidth { get; set; }
+        //        public int CellHeight { get; set; }
+        //        public int NumberOfSheets { get; set; }
+        //        public int MaxCharacterWidth { get; set; }
+        //        public int Baseline_Position { get; set; }
+        //        public int SheetImgFormat { get; set; }
+        //        public int NumberOfSheetColumns { get; set; }
+        //        public int NumberOfSheetRows { get; set; }
+        //        public int SheetWidth { get; set; }
+        //        public int SheetHeight { get; set; }
 
-		//        public override string ToString()
-		//        {
-		//            return "TGLP_v4";
-		//        }
-		//    }
+        //        public override string ToString()
+        //        {
+        //            return "TGLP_v4";
+        //        }
+        //    }
 
-		//    public override string ToString()
-		//    {
-		//        return "FINF_v4";
-		//    }
-		//}
-		#endregion
+        //    public override string ToString()
+        //    {
+        //        return "FINF_v4";
+        //    }
+        //}
+        #endregion
 
         public CFNT_PropertyGridSetting(CFNTFormat.CFNT CFNTData)
-		{
+        {
             CFNTHeader = CFNTData.CFNTHeader;
             BOM = CFNTData.BOM;
             HeaderSize = CFNTData.HeaderSize;
@@ -319,13 +319,13 @@ namespace BCFNT_Viewer
             BlockNumCount = CFNTData.BlockNumCount;
             Version3_FINF = new Version3_FINF_PGS(CFNTData.FINF_v3);
             //Ver_4
-		}
+        }
 
-		public override string ToString()
-		{
-			return "CFNT";
-		}
-	}
+        public override string ToString()
+        {
+            return "CFNT";
+        }
+    }
 
     public class CustomSortTypeConverter : TypeConverter
     {

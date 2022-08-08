@@ -11,10 +11,10 @@ namespace BCFNT_Viewer
     public class CFNTFormat
     {
         public enum FINFVersion
-		{
+        {
             Version3 = 3, //BCFNT
             Version4 = 4 //BFFNT
-		}
+        }
 
         public class CFNT
         {
@@ -22,14 +22,14 @@ namespace BCFNT_Viewer
             public byte[] BOM { get; set; }
             public short HeaderSize { get; set; } //0x2
             public int Version { get; set; }
-			public FINFVersion FINFVer => (FINFVersion)Version;
-			public int FileSize { get; set; }
+            public FINFVersion FINFVer => (FINFVersion)Version;
+            public int FileSize { get; set; }
             public int BlockNumCount { get; set; }
             public FINF.Version3 FINF_v3 { get; set; }
             public FINF.Version4 FINF_v4 { get; set; }
 
             public void ReadCFNT(BinaryReader br)
-			{
+            {
                 CFNTHeader = br.ReadChars(4);
                 if (new string(CFNTHeader) != "CFNT") throw new Exception("不明なフォーマットです");
                 BOM = br.ReadBytes(2);
@@ -58,7 +58,7 @@ namespace BCFNT_Viewer
             }
 
             public CFNT(FINFVersion FINF_Version)
-			{
+            {
                 CFNTHeader = "CFNT".ToArray();
                 BOM = new List<byte>().ToArray();
                 HeaderSize = 0;
@@ -67,7 +67,7 @@ namespace BCFNT_Viewer
                 BlockNumCount = 0;
                 if (FINF_Version == FINFVersion.Version3) FINF_v3 = new FINF.Version3();
                 if (FINF_Version == FINFVersion.Version4) FINF_v4 = new FINF.Version4();
-			}
+            }
         }
 
         public class FINF
@@ -82,7 +82,7 @@ namespace BCFNT_Viewer
                 public byte FontType { get; set; } //0x1
                 public byte LineFeed { get; set; } //0x1
                 public short AlterCharIndex { get; set; } //0x2
-                public DefaultWidth DefaultWidth { get; set; } 
+                public DefaultWidth DefaultWidth { get; set; }
                 public byte Encoding { get; set; }
                 public int TGLP_Offset { get; set; } //r:-8, w:+8
                 public TGLP.Version3 TGLP_Ver3 { get; set; }
@@ -96,7 +96,7 @@ namespace BCFNT_Viewer
                 public byte Reserved { get; set; }
 
                 public void ReadFINF_V3(BinaryReader br, byte[] BOM)
-				{
+                {
                     EndianConvert endianConvert = new EndianConvert(BOM);
                     FINFHeader = br.ReadChars(4);
                     if (new string(FINFHeader) != "FINF") throw new Exception("不明なフォーマットです");
@@ -109,7 +109,7 @@ namespace BCFNT_Viewer
                     Encoding = br.ReadByte();
                     TGLP_Offset = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                     if (TGLP_Offset != 0)
-					{
+                    {
                         var Pos = br.BaseStream.Position;
                         br.BaseStream.Position = 0;
                         br.BaseStream.Seek(TGLP_Offset - 8, SeekOrigin.Current);
@@ -118,7 +118,7 @@ namespace BCFNT_Viewer
                     }
                     CWDH_Offset = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                     if (CWDH_Offset != 0)
-					{
+                    {
                         var Pos = br.BaseStream.Position;
                         br.BaseStream.Position = 0;
                         br.BaseStream.Seek(CWDH_Offset - 8, SeekOrigin.Current);
@@ -141,7 +141,7 @@ namespace BCFNT_Viewer
                 }
 
                 public void WriteFINF_V3(BinaryWriter bw, byte[] BOM)
-				{
+                {
                     EndianConvert endianConvert = new EndianConvert(BOM);
                     bw.Write(FINFHeader);
                     bw.Write(endianConvert.Convert(BitConverter.GetBytes(SectionSize)));
@@ -160,7 +160,7 @@ namespace BCFNT_Viewer
                 }
 
                 public Version3()
-				{
+                {
                     FINFHeader = "FINF".ToArray();
                     SectionSize = 0;
                     FontType = 0x00;
@@ -204,9 +204,9 @@ namespace BCFNT_Viewer
                 public List<CMAP> CMAP { get; set; }
 
                 public Version4()
-				{
+                {
 
-				}
+                }
             }
         }
 
@@ -217,30 +217,30 @@ namespace BCFNT_Viewer
             public byte CharWidth { get; set; }
 
             public int GetSize()
-			{
+            {
                 return 3;
-			}
+            }
 
             public void ReadDefWidth(BinaryReader br)
-			{
+            {
                 Left = br.ReadByte();
                 GlyphWidth = br.ReadByte();
                 CharWidth = br.ReadByte();
-			}
+            }
 
             public void WriteDefWidth(BinaryWriter bw)
-			{
+            {
                 bw.Write(Left);
                 bw.Write(GlyphWidth);
                 bw.Write(CharWidth);
-			}
+            }
 
             public DefaultWidth()
-			{
+            {
                 Left = 0;
                 GlyphWidth = 0;
                 CharWidth = 0;
-			}
+            }
         }
 
         public class TGLP
@@ -265,7 +265,7 @@ namespace BCFNT_Viewer
                 //SectionSize - HeaderSize
                 public List<TGLPImgData> TGLPImgDataList { get; set; }
                 public class TGLPImgData
-				{
+                {
                     public int Index { get; set; }
 
                     public short ImageWidth { get; set; }
@@ -291,7 +291,7 @@ namespace BCFNT_Viewer
                     //}
 
                     public TGLPImgData(int Count, byte[] Input, short ImgWidth, short ImgHeight, short ImgFormat)
-					{
+                    {
                         Index = Count;
 
                         ImageWidth = ImgWidth;
@@ -299,13 +299,13 @@ namespace BCFNT_Viewer
                         ImageFormat = ImgFormat;
 
                         ImgData = Input;
-					}
-				}
+                    }
+                }
 
                 public byte[] UnknownArea { get; set; }
 
                 public int GetSize()
-				{
+                {
                     int Sum = 0;
                     Sum += TGLPHeader.Length;
                     Sum += BitConverter.GetBytes(SectionSize).Length;
@@ -331,10 +331,10 @@ namespace BCFNT_Viewer
 
                     Sum += UnknownArea.Length;
                     return Sum;
-				}
+                }
 
                 public void ReadTGLP_V3(BinaryReader br, byte[] BOM)
-				{
+                {
                     EndianConvert endianConvert = new EndianConvert(BOM);
                     TGLPHeader = br.ReadChars(4);
                     SectionSize = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
@@ -351,42 +351,42 @@ namespace BCFNT_Viewer
                     SheetHeight = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                     SheetDataOffset = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                     if (SheetDataOffset != 0)
-					{
+                    {
                         var Pos = br.BaseStream.Position;
                         br.BaseStream.Position = 0;
                         br.BaseStream.Seek(SheetDataOffset, SeekOrigin.Current);
 
                         int AllSheetImgSize = SheetSize * NumberOfSheets;
 
-						//List<Bitmap> CFNTFontImgList = new List<Bitmap>();
-						//for (int i = 0; i < NumberOfSheets; i++)
-						//{
-						//    Bitmap bitmaps = Textures.ToBitmap(br.ReadBytes(SheetSize), SheetWidth, SheetHeight, (Textures.ImageFormat)SheetImgFormat);
-						//    CFNTFontImgList.Add(bitmaps);
-						//}
+                        //List<Bitmap> CFNTFontImgList = new List<Bitmap>();
+                        //for (int i = 0; i < NumberOfSheets; i++)
+                        //{
+                        //    Bitmap bitmaps = Textures.ToBitmap(br.ReadBytes(SheetSize), SheetWidth, SheetHeight, (Textures.ImageFormat)SheetImgFormat);
+                        //    CFNTFontImgList.Add(bitmaps);
+                        //}
 
 
-						for (int i = 0; i < NumberOfSheets; i++)
-						{
+                        for (int i = 0; i < NumberOfSheets; i++)
+                        {
                             //TGLPImgData tGLPImgData = new TGLPImgData(br.ReadBytes(SheetSize), i);
                             TGLPImgData tGLPImgData = new TGLPImgData(i, br.ReadBytes(SheetSize), SheetWidth, SheetHeight, SheetImgFormat);
                             TGLPImgDataList.Add(tGLPImgData);
-						}
+                        }
 
-						//int s = BitConverter.ToInt16(version3_TGLP.NumberOfColumns, 0);
-						//int s2 = BitConverter.ToInt16(version3_TGLP.NumberOfRows, 0);
-						//int s3 = BitConverter.ToInt16(version3_TGLP.NumberOfSheets, 0);
-						//var sw = (float)version3_TGLP.CellWidth;
-						//var sw2 = (float)version3_TGLP.CellHeight;
+                        //int s = BitConverter.ToInt16(version3_TGLP.NumberOfColumns, 0);
+                        //int s2 = BitConverter.ToInt16(version3_TGLP.NumberOfRows, 0);
+                        //int s3 = BitConverter.ToInt16(version3_TGLP.NumberOfSheets, 0);
+                        //var sw = (float)version3_TGLP.CellWidth;
+                        //var sw2 = (float)version3_TGLP.CellHeight;
 
-						br.BaseStream.Position = Pos;
+                        br.BaseStream.Position = Pos;
                     }
 
                     UnknownArea = br.ReadBytes(44);
                 }
 
                 public Version3()
-				{
+                {
                     TGLPHeader = "TGLP".ToArray();
                     SectionSize = 0;
                     CellWidth = 0x00;
@@ -404,7 +404,7 @@ namespace BCFNT_Viewer
 
                     TGLPImgDataList = new List<TGLPImgData>();
                     UnknownArea = new List<byte>().ToArray();
-				}
+                }
             }
 
             public class Version4
@@ -451,7 +451,7 @@ namespace BCFNT_Viewer
             public List<byte[]> CharList { get; set; }
 
             public int GetSize()
-			{
+            {
                 int Sum = 0;
                 Sum += CMAPHeader.Length;
                 Sum += BitConverter.GetBytes(SectionSize).Length;
@@ -462,14 +462,14 @@ namespace BCFNT_Viewer
                 Sum += BitConverter.GetBytes(NextCMAPOffset).Length;
 
                 if (MappingTypes == MappingType.Direct)
-				{
+                {
                     Sum += BitConverter.GetBytes(UnknownData).Length;
                 }
                 return Sum;
-			}
+            }
 
             public void ReadCMAP(BinaryReader br, byte[] BOM)
-			{
+            {
                 EndianConvert endianConvert = new EndianConvert(BOM);
                 CMAPHeader = br.ReadChars(4);
                 if (new string(CMAPHeader) != "CMAP") throw new Exception("不明なフォーマットです");
@@ -480,7 +480,7 @@ namespace BCFNT_Viewer
                 ReservedByte = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                 NextCMAPOffset = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                 if (NextCMAPOffset != 0)
-				{
+                {
                     var Pos = br.BaseStream.Position;
                     br.BaseStream.Position = 0;
                     br.BaseStream.Seek(NextCMAPOffset - 8, SeekOrigin.Current);
@@ -490,7 +490,7 @@ namespace BCFNT_Viewer
                 }
 
                 if (MappingTypes == MappingType.Direct)
-				{
+                {
                     UnknownData = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                 }
 
@@ -505,7 +505,7 @@ namespace BCFNT_Viewer
             }
 
             public CMAP()
-			{
+            {
                 CMAPHeader = "CMAP".ToArray();
                 SectionSize = 0;
                 CodeBegin = 0;
@@ -517,7 +517,7 @@ namespace BCFNT_Viewer
                 N_CMAP = null;
                 UnknownData = 0;
                 CharList = new List<byte[]>();
-			}
+            }
         }
 
         public class CWDH
@@ -531,7 +531,7 @@ namespace BCFNT_Viewer
             public List<CharWidth> CharWidth_List { get; set; }
 
             public void ReadCWDH(BinaryReader br, byte[] BOM)
-			{
+            {
                 EndianConvert endianConvert = new EndianConvert(BOM);
                 CWDHHeader = br.ReadChars(4);
                 if (new string(CWDHHeader) != "CWDH") throw new Exception("不明なフォーマットです");
@@ -539,17 +539,17 @@ namespace BCFNT_Viewer
                 StartIndex = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                 EndIndex = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                 NextCWDHOffset = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
-				if (NextCWDHOffset != 0)
-				{
-					var Pos = br.BaseStream.Position;
-					br.BaseStream.Position = 0;
-					br.BaseStream.Seek(NextCWDHOffset - 8, SeekOrigin.Current);
+                if (NextCWDHOffset != 0)
+                {
+                    var Pos = br.BaseStream.Position;
+                    br.BaseStream.Position = 0;
+                    br.BaseStream.Seek(NextCWDHOffset - 8, SeekOrigin.Current);
                     N_CWDH = new CWDH();
-					N_CWDH.ReadCWDH(br, BOM);
-					br.BaseStream.Position = Pos;
-				}
+                    N_CWDH.ReadCWDH(br, BOM);
+                    br.BaseStream.Position = Pos;
+                }
 
-				for (int Count = 0; Count < EndIndex; Count++)
+                for (int Count = 0; Count < EndIndex; Count++)
                 {
                     CharWidth charWidth = new CharWidth();
                     charWidth.ReadCharWidth(br, Count);
@@ -558,12 +558,12 @@ namespace BCFNT_Viewer
             }
 
             public void WriteCWDH(BinaryReader br, byte[] BOM)
-			{
+            {
 
-			}
+            }
 
             public CWDH()
-			{
+            {
                 CWDHHeader = "CWDH".ToArray();
                 SectionSize = 0;
                 StartIndex = 0;
@@ -572,7 +572,7 @@ namespace BCFNT_Viewer
                 //N_CWDH = new CWDH();
                 N_CWDH = null;
                 CharWidth_List = new List<CharWidth>();
-			}
+            }
         }
 
         public class CharWidth
@@ -583,27 +583,27 @@ namespace BCFNT_Viewer
             public byte Char_Width { get; set; }
 
             public void ReadCharWidth(BinaryReader br, int Count)
-			{
+            {
                 GlyphNumber = Count;
                 Left = br.ReadByte();
                 Glyph_Width = br.ReadByte();
                 Char_Width = br.ReadByte();
-			}
+            }
 
             public void WriteCharWidth(BinaryWriter bw)
-			{
+            {
                 bw.Write(Left);
                 bw.Write(Glyph_Width);
                 bw.Write(Char_Width);
-			}
+            }
 
             public CharWidth(int Idx = 0, int left = 0, int GlyphWidth = 0, int CharWidth = 0)
-			{
+            {
                 GlyphNumber = Idx;
                 Left = (byte)left;
                 Glyph_Width = (byte)GlyphWidth;
                 Char_Width = (byte)CharWidth;
-			}
+            }
         }
     }
 }
