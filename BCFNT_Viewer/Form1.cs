@@ -38,6 +38,9 @@ namespace BCFNT_Viewer
             CFNTData = new CFNTFormat.CFNT(CFNTFormat.FINFVersion.Version3);
             CFNTData.ReadCFNT(br1);
 
+            br1.Close();
+            fs1.Close();
+
             pictureBox1.BackColor = Color.Black;
             pictureBox1.Image = CFNTData.FINF_v3.TGLP_Ver3.TGLPImgDataList[0].SheetImg;
 
@@ -54,7 +57,23 @@ namespace BCFNT_Viewer
 
         private void saveBCFNTToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //ファイルを開く
+            SaveFileDialog Save_BCFNT = new SaveFileDialog()
+            {
+                Title = "Save(BCFNT)",
+                InitialDirectory = @"C:\Users\User\Desktop",
+                Filter = "bcfnt file|*.bcfnt"
+            };
 
+            if (Save_BCFNT.ShowDialog() != DialogResult.OK) return;
+
+            System.IO.FileStream fs1 = new FileStream(Save_BCFNT.FileName, FileMode.Create, FileAccess.Write);
+            BinaryWriter bw1 = new BinaryWriter(fs1);
+
+            CFNTData.WriteCFNT(bw1);
+
+            bw1.Close();
+            fs1.Close();
         }
     }
 }

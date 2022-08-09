@@ -218,6 +218,22 @@ namespace BCFNT_Viewer
             if (typeof(T) == typeof(ulong)) obj = BitConverter.ToUInt64(byteAry, startIndex);
             return (T)obj;
         }
+
+
+        //public static int GetLength<T>(T Input)
+        //{
+        //    int res = 0;
+        //    if (typeof(T).IsArray)
+        //    {
+
+        //    }
+        //    if (!typeof(T).IsArray)
+        //    {
+        //        if (typeof(T) == typeof(byte)) res = 1;
+        //    }
+
+        //    return res;
+        //}
     }
 
     public class BinaryReadHelper
@@ -244,4 +260,82 @@ namespace BCFNT_Viewer
             BR = br;
         }
     }
+
+    //public class BinaryWriteHelper
+    //{
+    //    public long Offset;
+    //    public byte[] InputBytes;
+    //    public BinaryWriter BW;
+
+    //    /// <summary>
+    //    /// 
+    //    /// </summary>
+    //    public enum JumpPosition
+    //    {
+    //        Begin,
+    //        End
+    //    }
+
+    //    public int ReadOffset()
+    //    {
+    //        return 
+    //    }
+
+    //    public void InputOffset()
+    //    {
+    //        Offset = BW.BaseStream.Position;
+    //    }
+
+    //    public long GetOffset()
+    //    {
+    //        return Offset;
+    //    }
+
+    //    public void ReturnOffset()
+    //    {
+    //        BW.BaseStream.Position = Offset;
+    //    }
+
+    //    public void OffsetJump()
+    //    {
+    //        BW.BaseStream.Seek(Offset, SeekOrigin.Current);
+    //    }
+
+    //    public void InputPos(JumpPosition jumpPosition)
+    //    {
+    //        if (jumpPosition == JumpPosition.Begin)
+    //        {
+    //            BW.BaseStream.Seek(-4, SeekOrigin.Current);
+    //            Offset = BW.BaseStream.Position;
+    //        }
+    //        if (jumpPosition == JumpPosition.End)
+    //        {
+    //            Offset = BW.BaseStream.Position;
+    //            //BW.BaseStream.Seek(-4, SeekOrigin.Current);
+    //        }
+    //    }
+
+    //    //public ReadSection(Task<T> t)
+    //    //{
+
+    //    //}
+
+    //    public BinaryWriteHelper(BinaryWriter bw, object InputByteData)
+    //    {
+    //        BW = bw;
+    //        InputBytes = InputByteData;
+    //    }
+    //}
+
+
+    //public class Test
+    //{
+    //    public static void QW(BinaryWriter bw)
+    //    {
+    //        byte[] QE = new byte[] { 0x00, 0x40, 0x80, 0x12 };
+    //        BinaryWriteHelper binaryWriteHelper = new BinaryWriteHelper(bw, QE);
+    //        binaryWriteHelper.InputPos(BinaryWriteHelper.JumpPosition.Begin);
+
+    //    }
+    //}
 }
