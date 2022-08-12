@@ -207,17 +207,25 @@ namespace BCFNT_Viewer
                     bw.Write(endianConvert.Convert(BitConverter.GetBytes(AlterCharIndex)));
                     DefaultWidth.WriteDefWidth(bw);
                     bw.Write(Encoding);
+
+                    long p1 = 0;
+                    long p2 = 0;
+                    long p3 = 0;
+
                     if (TGLP_Ver3 != null)
                     {
-                        bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + 8))); //TGLP_Offset;
+                        p1 = bw.BaseStream.Position;
+                        bw.Write(0); //TGLP_Offset;
                     }
                     if (CWDH != null)
                     {
-                        bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + TGLP_Ver3.GetSize() + 8))); //CWDH_Offset;
+                        p2 = bw.BaseStream.Position;
+                        bw.Write(0); //CWDH_Offset;
                     }
                     if (CMAP != null)
                     {
-                        bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + TGLP_Ver3.GetSize() + CWDH.GetSize() + 8))); //CMAP_Offset;
+                        p3 = bw.BaseStream.Position;
+                        bw.Write(0); //CMAP_Offset;
                     }
 
                     //TGLP, CWDH, CMAP
@@ -229,16 +237,69 @@ namespace BCFNT_Viewer
 
                     if (TGLP_Ver3 != null)
                     {
+                        //WriteOffset
+                        long CurrentPos = bw.BaseStream.Position;
+                        bw.BaseStream.Position = p1;
+                        bw.Write((int)CurrentPos + 8);
+                        bw.BaseStream.Position = CurrentPos;
+
                         TGLP_Ver3.WriteTGLP_V3(bw, BOM);
                     }
                     if (CWDH != null)
                     {
+                        //WriteOffset
+                        long CurrentPos = bw.BaseStream.Position;
+                        bw.BaseStream.Position = p2;
+                        bw.Write((int)CurrentPos + 8);
+                        bw.BaseStream.Position = CurrentPos;
+
                         CWDH.WriteCWDH(bw, BOM);
                     }
                     if (CMAP != null)
                     {
+                        //WriteOffset
+                        long CurrentPos = bw.BaseStream.Position;
+                        bw.BaseStream.Position = p3;
+                        bw.Write((int)CurrentPos + 8);
+                        bw.BaseStream.Position = CurrentPos;
+
                         CMAP.WriteCMAP(bw, BOM);
                     }
+
+                    #region DelCode
+                    //if (TGLP_Ver3 != null)
+                    //{
+                    //    bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + 8))); //TGLP_Offset;
+                    //}
+                    //if (CWDH != null)
+                    //{
+                    //    bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + TGLP_Ver3.GetSize() + 4))); //CWDH_Offset;
+                    //}
+                    //if (CMAP != null)
+                    //{
+                    //    bw.Write(endianConvert.Convert(BitConverter.GetBytes(20 + GetFINFHeaderSize() + TGLP_Ver3.GetSize() + CWDH.GetAllSize() + 8))); //CMAP_Offset;
+                    //}
+
+                    ////TGLP, CWDH, CMAP
+
+                    //bw.Write(Height);
+                    //bw.Write(Width);
+                    //bw.Write(Ascent);
+                    //bw.Write(Reserved);
+
+                    //if (TGLP_Ver3 != null)
+                    //{
+                    //    TGLP_Ver3.WriteTGLP_V3(bw, BOM);
+                    //}
+                    //if (CWDH != null)
+                    //{
+                    //    CWDH.WriteCWDH(bw, BOM);
+                    //}
+                    //if (CMAP != null)
+                    //{
+                    //    CMAP.WriteCMAP(bw, BOM);
+                    //}
+                    #endregion
                 }
 
                 public Version3()
@@ -550,6 +611,25 @@ namespace BCFNT_Viewer
             public CWDH N_CWDH { get; set; }
             public List<CharWidth> CharWidth_List { get; set; }
 
+            public int GetAllSize()
+            {
+                int Sum = 0;
+                Sum += CWDHHeader.Length;
+                Sum += BitConverter.GetBytes(new int()).Length;
+                Sum += BitConverter.GetBytes(new short()).Length;
+                Sum += BitConverter.GetBytes(new short()).Length;
+                Sum += BitConverter.GetBytes(new int()).Length;
+                if (N_CWDH != null)
+                {
+                    Sum += N_CWDH.GetSize();
+                }
+                foreach (var n in CharWidth_List)
+                {
+                    Sum += n.GetSize();
+                }
+
+                return Sum;
+            }
             public int GetSize()
             {
                 int Sum = 0;
