@@ -44,7 +44,7 @@ namespace BCFNT_Viewer
             public void ReadCFNT(BinaryReader br)
             {
                 CFNTHeader = br.ReadChars(4);
-                if (new string(CFNTHeader) != "CFNT") throw new Exception("不明なフォーマットです");
+                if (new string(CFNTHeader) != "CFNT") throw new Exception("CFNT Section");
                 BOM = br.ReadBytes(2);
 
                 EndianConvert endianConvert = new EndianConvert(BOM);
@@ -63,7 +63,7 @@ namespace BCFNT_Viewer
 
                 EndianConvert endianConvert = new EndianConvert(BOM);
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes((short)20)));
-                bw.Write(endianConvert.Convert(BitConverter.GetBytes(Version)));
+                bw.Write(endianConvert.Convert(BitConverter.GetBytes(Version)).Reverse().ToArray());
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes(GetCFNTSize())));
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes(BlockNumCount)));
                 if (FINFVer == FINFVersion.Version3) FINF_v3.WriteFINF_V3(bw, BOM);
@@ -146,7 +146,7 @@ namespace BCFNT_Viewer
                     Sum += 1; //Ascent
                     Sum += 1; //Reserved
                     Sum += TGLP_Ver3.GetSize();
-                    Sum += CWDH.GetSize();
+                    Sum += CWDH.GetAllSize();
                     Sum += CMAP.GetSize();
                     return Sum;
                 }
@@ -454,20 +454,21 @@ namespace BCFNT_Viewer
                 public int GetSize()
                 {
                     int Sum = 0;
+
                     Sum += TGLPHeader.Length;
-                    Sum += BitConverter.GetBytes(SectionSize).Length;
-                    Sum += BitConverter.GetBytes(CellWidth).Length;
-                    Sum += BitConverter.GetBytes(CellHeight).Length;
-                    Sum += BitConverter.GetBytes(Baseline_Position).Length;
-                    Sum += BitConverter.GetBytes(MaxCharacterWidth).Length;
-                    Sum += BitConverter.GetBytes(SheetSize).Length;
-                    Sum += BitConverter.GetBytes(NumberOfSheets).Length;
-                    Sum += BitConverter.GetBytes(SheetImgFormat).Length;
-                    Sum += BitConverter.GetBytes(NumberOfColumns).Length;
-                    Sum += BitConverter.GetBytes(NumberOfRows).Length;
-                    Sum += BitConverter.GetBytes(SheetWidth).Length;
-                    Sum += BitConverter.GetBytes(SheetHeight).Length;
-                    Sum += BitConverter.GetBytes(SheetDataOffset).Length;
+                    Sum += BitConverter.GetBytes(new int()).Length; //SectionSize
+                    Sum += 1; //CellWidth
+                    Sum += 1; //CellHeight
+                    Sum += 1; //Baseline_Position
+                    Sum += 1; //MaxCharacterWidth
+                    Sum += BitConverter.GetBytes(new int()).Length; //SheetSize
+                    Sum += BitConverter.GetBytes(new short()).Length; //NumberOfSheets
+                    Sum += BitConverter.GetBytes(new short()).Length; //SheetImgFormat
+                    Sum += BitConverter.GetBytes(new short()).Length; //NumberOfColumns
+                    Sum += BitConverter.GetBytes(new short()).Length; //NumberOfRows
+                    Sum += BitConverter.GetBytes(new short()).Length; //SheetWidth
+                    Sum += BitConverter.GetBytes(new short()).Length; //SheetHeight
+                    Sum += BitConverter.GetBytes(new int()).Length; //SheetDataOffset
 
                     //ImgData
                     for (int i = 0; i < NumberOfSheets; i++)
@@ -484,6 +485,7 @@ namespace BCFNT_Viewer
                 {
                     EndianConvert endianConvert = new EndianConvert(BOM);
                     TGLPHeader = br.ReadChars(4);
+                    if (new string(TGLPHeader) != "TGLP") throw new Exception("Error : TGLP(v3) Section");
                     SectionSize = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                     CellWidth = br.ReadByte();
                     CellHeight = br.ReadByte();
@@ -621,23 +623,8 @@ namespace BCFNT_Viewer
                 Sum += BitConverter.GetBytes(new int()).Length;
                 if (N_CWDH != null)
                 {
-                    Sum += N_CWDH.GetSize();
+                    Sum += N_CWDH.GetAllSize();
                 }
-                foreach (var n in CharWidth_List)
-                {
-                    Sum += n.GetSize();
-                }
-
-                return Sum;
-            }
-            public int GetSize()
-            {
-                int Sum = 0;
-                Sum += CWDHHeader.Length;
-                Sum += BitConverter.GetBytes(new int()).Length;
-                Sum += BitConverter.GetBytes(new short()).Length;
-                Sum += BitConverter.GetBytes(new short()).Length;
-                Sum += BitConverter.GetBytes(new int()).Length;
                 foreach (var n in CharWidth_List)
                 {
                     Sum += n.GetSize();
@@ -650,7 +637,7 @@ namespace BCFNT_Viewer
             {
                 EndianConvert endianConvert = new EndianConvert(BOM);
                 CWDHHeader = br.ReadChars(4);
-                if (new string(CWDHHeader) != "CWDH") throw new Exception("不明なフォーマットです");
+                if (new string(CWDHHeader) != "CWDH") throw new Exception("Error : CWDH Section");
                 SectionSize = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                 StartIndex = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                 EndIndex = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
@@ -677,7 +664,7 @@ namespace BCFNT_Viewer
             {
                 bw.Write(CWDHHeader);
                 EndianConvert endianConvert = new EndianConvert(BOM);
-                bw.Write(endianConvert.Convert(BitConverter.GetBytes(GetSize()))); //SectionSize
+                bw.Write(endianConvert.Convert(BitConverter.GetBytes(GetAllSize()))); //SectionSize
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes(StartIndex)));
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes(EndIndex)));
                 bw.Write(endianConvert.Convert(BitConverter.GetBytes(NextCWDHOffset)));
@@ -713,9 +700,12 @@ namespace BCFNT_Viewer
             public int GetSize()
             {
                 int Sum = 0;
-                Sum += BitConverter.GetBytes(Left).Length;
-                Sum += BitConverter.GetBytes(Glyph_Width).Length;
-                Sum += BitConverter.GetBytes(Char_Width).Length;
+                Sum += 1; //Left
+                Sum += 1; //Glyph_Width
+                Sum += 1; //Char_Width
+                //Sum += BitConverter.GetBytes(Left).Length;
+                //Sum += BitConverter.GetBytes(Glyph_Width).Length;
+                //Sum += BitConverter.GetBytes(Char_Width).Length;
                 return Sum;
             }
 
@@ -768,12 +758,12 @@ namespace BCFNT_Viewer
             {
                 int Sum = 0;
                 Sum += CMAPHeader.Length;
-                Sum += BitConverter.GetBytes(SectionSize).Length;
-                Sum += BitConverter.GetBytes(CodeBegin).Length;
-                Sum += BitConverter.GetBytes(CodeEnd).Length;
-                Sum += BitConverter.GetBytes(MappingMethod).Length;
-                Sum += BitConverter.GetBytes(ReservedByte).Length;
-                Sum += BitConverter.GetBytes(NextCMAPOffset).Length;
+                Sum += BitConverter.GetBytes(new int()).Length; //SectionSize
+                Sum += BitConverter.GetBytes(new short()).Length; //CodeBegin
+                Sum += BitConverter.GetBytes(new short()).Length; //CodeEnd
+                Sum += BitConverter.GetBytes(new short()).Length; //MappingMethod
+                Sum += BitConverter.GetBytes(new short()).Length; //ReservedByte
+                Sum += BitConverter.GetBytes(new int()).Length; //NextCMAPOffset
                 if (MappingTypes == MappingType.Direct)
                 {
                     Sum += BitConverter.GetBytes(UnknownData).Length;
@@ -790,7 +780,7 @@ namespace BCFNT_Viewer
             {
                 EndianConvert endianConvert = new EndianConvert(BOM);
                 CMAPHeader = br.ReadChars(4);
-                if (new string(CMAPHeader) != "CMAP") throw new Exception("不明なフォーマットです");
+                if (new string(CMAPHeader) != "CMAP") throw new Exception("Error : CMAP Section");
                 SectionSize = BitConverter.ToInt32(endianConvert.Convert(br.ReadBytes(4)), 0);
                 CodeBegin = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
                 CodeEnd = BitConverter.ToInt16(endianConvert.Convert(br.ReadBytes(2)), 0);
